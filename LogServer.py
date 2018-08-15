@@ -37,10 +37,11 @@ class TCP_Server(StreamRequestHandler):
             try:
                 fn = self.recv_data()
             except:
-                logging.info('Connection closed by %s', self.client_address)
+                logging.info('Connection is abnormally closed by %s', self.client_address)
                 break
 
             if not fn:
+                logging.info('Connection closed by %s', self.client_address)
                 break
 
             try:

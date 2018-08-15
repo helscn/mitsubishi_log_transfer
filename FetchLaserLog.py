@@ -205,17 +205,17 @@ class Ui_Form(object):
                                 send_data(sock, log['remoteFilePath'].format(**d))
                                 header, data = parse_log(recv_data(sock))
                                 if not get_header and header:
-                                    wf.write(header + '\n')
+                                    f.write(header + '\n')
                                     get_header = True
                                 if data:
-                                    wf.write(data + '\n')
+                                    f.write(data + '\n')
                     except:
                         failed = True
                         error_text = QtWidgets.QTableWidgetItem('无法保存记录')
                         error_text.setBackground(QtGui.QColor(200, 50, 50))
                         self.tblServers.setItem(i, 4, error_text)
                 try:
-                    send_data(sock, False)
+                    send_data(sock, False)      # 通知远程服务器关闭连接
                     sock.close()
                 except:
                     pass
