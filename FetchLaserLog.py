@@ -172,8 +172,37 @@ class Ui_Form(object):
                                 QMessageBox.Ok)
         self.progressBar.setValue(0)
 
+    def get_servers(self):
+        # 读取镭射机服务器信息文件并返回服务器列表
+        filename = r'Servers.csv'
+        servers = []
+        try:
+            with open(filename) as f:
+                f_csv = csv.reader(f)
+                for row in f_csv:
+                    if len(row) == 3 and row[2].isdigit():
+                        row[2] = int(row[2])
+                        # servers.append(row)
+                        servers.append({'machine': row[0], 'ip': row[1], 'port': row[2]})
+        except:
+            QMessageBox.warning(self.form, "错误", "无法读取服务器列表文件：\n" + filename, QMessageBox.Ok)
+        return servers
+
+    def get_log_formats(self):
+        filename = r'LogFormats.csv'
+        log_formats = []
+        try:
+            with open(filename) as f:
+                f_csv = csv.reader(f)
+                for row in f_csv:
+                    if len(row) >= 3 and (row[0].upper() in ['TRUE', '1', 'YES', 'V']):
+                        log_formats.append({'remoteFilePath': row[1], 'localFileName': row[2]})
+        except:
+            QMessageBox.warning(self.form, "错误", "无法读取加工记录格式文件：\n" + filename, QMessageBox.Ok)
+        return log_formats
+
     def ouput_Log(self):
-        log_formats = get_log_formats()
+        log_formats = self.get_log_formats()
         if len(log_formats) == 0:
             QMessageBox.warning(self.form, '警告', '加工记录格式文件中没有指定要读取的加工记录！', QMessageBox.Ok)
             return
@@ -257,7 +286,7 @@ class Ui_Form(object):
         table.setRowCount(0)
         table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-        self.servers = get_servers()
+        self.servers = self.get_servers()
         for server in self.servers:
             row = table.rowCount()
             table.setRowCount(row + 1)
@@ -323,35 +352,6 @@ class Ui_Form(object):
         self.btnExit.setText(_translate("Form", "关闭程序"))
 
 
-def get_servers():
-    # 读取镭射机服务器信息文件并返回服务器列表
-    filename = r'Servers.csv'
-    servers = []
-    try:
-        with open(filename) as f:
-            f_csv = csv.reader(f)
-            for row in f_csv:
-                if len(row) == 3 and row[2].isdigit():
-                    row[2] = int(row[2])
-                    # servers.append(row)
-                    servers.append({'machine': row[0], 'ip': row[1], 'port': row[2]})
-    except:
-        QMessageBox.warning(self.form, "错误", "无法读取服务器列表文件：\n" + filename, QMessageBox.Ok)
-    return servers
-
-
-def get_log_formats():
-    filename = r'LogFormats.csv'
-    log_formats = []
-    try:
-        with open(filename) as f:
-            f_csv = csv.reader(f)
-            for row in f_csv:
-                if len(row) >= 3 and (row[0].upper() in ['TRUE', '1', 'YES', 'V']):
-                    log_formats.append({'remoteFilePath': row[1], 'localFileName': row[2]})
-    except:
-        QMessageBox.warning(self.form, "错误", "无法读取加工记录格式文件：\n" + filename, QMessageBox.Ok)
-    return log_formats
 
 
 def connect_to(host, port):

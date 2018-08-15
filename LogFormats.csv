@@ -1,3 +1,18 @@
 Output,RemoteFileName,LocalFileName,Comment
-TRUE,C:\pban\log\{Y}{m}\sinsyuku_{y}{m}{d}.log,{machine}-W.csv,Work Compensation
-TRUE,C:\pban\log\{Y}{m}\length_{y}{m}{d}.log,{machine}-A.csv,Alignment mark
+FALSE,C:\pban\log\{Y}{m}\aaa_{y}{m}{d}.log,{machine}-Vision.csv,Vision sensor result
+FALSE,C:\pban\log\{Y}{m}\pwrdata_{y}{m}{d}.log,{machine}-Energy.csv,Energy
+FALSE,C:\pban\log\{Y}{m}\aaaGosa_{y}{m}{d}.log,{machine}-Galvano.csv,Galvano maximum error
+FALSE,C:\pban\log\{Y}{m}\Zaxis_{y}{m}{d}.log,{machine}-ZAxis.csv,Z axis position
+TRUE,C:\pban\log\{Y}{m}\sinsyuku_{y}{m}{d}.log,{machine}-Work.csv,Work compensation
+FALSE,C:\pban\log\{Y}{m}\m307data_{y}{m}{d}.log,{machine}-Power.csv,Power check
+FALSE,C:\pban\log\{Y}{m}\m370data_{y}{m}{d}.log,{machine}-Camera.csv,Camera offset
+TRUE,C:\pban\log\{Y}{m}\length_{y}{m}{d}.log,{machine}-Align.csv,Alignment mark
+FALSE,C:\pban\log\{Y}{m}\Almlog_{y}{m}{d}.log,{machine}-Alarm.csv,Alarm
+FALSE,C:\pban\log\{Y}{m}\maskGosa_{y}{m}{d}.log,{machine}-Mask.csv,Mask maximum error
+FALSE,C:\pban\log\{Y}{m}\cndselct_{y}{m}{d}.log,{machine}-Condition.csv,Processing condition
+FALSE,C:\pban\log\{Y}{m}\table_{y}{m}{d}.log,{machine}-Table.csv,Table correction
+FALSE,C:\pban\log\{Y}{m}\M377data_{y}{m}{d}.log,{machine}-Multipurpose.csv,Multipurpose history
+FALSE,C:\pban\log\{Y}{m}\Sinstatis_{y}{m}{d}.log,{machine}-Sinstatis.csv,Sinstatis
+FALSE,C:\pban\log\{Y}{m}\PcDirect_{y}{m}{d}.log,{machine}-Program.csv,Program Search
+FALSE,C:\pban\log\{Y}{m}\sensor_{y}{m}{d}.log,{machine}-Dust.csv,Dust & Table air
+FALSE,C:\pban\log\{Y}{m}\ProcState_{y}{m}{d}.log,{machine}-State.csv,Processing state
