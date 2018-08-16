@@ -33,21 +33,16 @@ class Ui_Form(object):
         self.horizontalLayout.setSpacing(23)
         self.horizontalLayout.setObjectName("horizontalLayout")
 
-        self.chkAreaA = QtWidgets.QCheckBox(self.groupBox)
-        self.chkAreaA.setObjectName("chkAreaA")
-        self.horizontalLayout.addWidget(self.chkAreaA)
-        self.chkAreaB = QtWidgets.QCheckBox(self.groupBox)
-        self.chkAreaB.setObjectName("chkAreaB")
-        self.horizontalLayout.addWidget(self.chkAreaB)
-        self.chkAreaC = QtWidgets.QCheckBox(self.groupBox)
-        self.chkAreaC.setObjectName("chkAreaC")
-        self.horizontalLayout.addWidget(self.chkAreaC)
-        self.chkAreaD = QtWidgets.QCheckBox(self.groupBox)
-        self.chkAreaD.setObjectName("chkAreaD")
-        self.horizontalLayout.addWidget(self.chkAreaD)
-        self.chkAreaE = QtWidgets.QCheckBox(self.groupBox)
-        self.chkAreaE.setObjectName("chkAreaE")
-        self.horizontalLayout.addWidget(self.chkAreaE)
+        self.areas = self.get_areas()
+        self.chkAreas = []
+        for area in self.areas:
+            ck = QtWidgets.QCheckBox(self.groupBox)
+            ck.setObjectName("chkArea" + area)
+            ck.setToolTip("<html><head/><body><p>取消/选择 所有{0}区镭射机</p></body></html>".format(area))
+            ck.setText(area + "区")
+            self.horizontalLayout.addWidget(ck)
+            self.chkAreas.append(ck)
+
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -148,7 +143,18 @@ class Ui_Form(object):
             if server['machine'].upper().find(area) >= 0:
                 server['checkbox'].setCheckState(sender.checkState())
 
+    def disable_button(self):
+        self.btnCheckRemoteServers.setDisabled(True)
+        self.btnGetLog.setDisabled(True)
+        self.btnExit.setDisabled(True)
+
+    def enable_button(self):
+        self.btnCheckRemoteServers.setDisabled(False)
+        self.btnGetLog.setDisabled(False)
+        self.btnExit.setDisabled(False)
+
     def check_remote_servers(self):
+        self.disable_button()
         failed_count = 0
         for i, server in enumerate(self.servers):
             try:
@@ -164,6 +170,7 @@ class Ui_Form(object):
                 error_text.setBackground(QtGui.QColor(200, 50, 50))
                 self.tblServers.setItem(i, 4, error_text)
             self.progressBar.setValue(int((i + 1) * 100 / len(self.servers)))
+        self.enable_button()
         if failed_count == 0:
             QMessageBox.information(self.form, '检查完毕', '镭射机远程连接检查完成，所有镭射机连接正常。', QMessageBox.Ok)
         else:
@@ -188,6 +195,15 @@ class Ui_Form(object):
             QMessageBox.warning(self.form, "错误", "无法读取服务器列表文件：\n" + filename, QMessageBox.Ok)
         return servers
 
+    def get_areas(self):
+        servers = self.get_servers()
+        areas = []
+        for server in servers:
+            area = server['machine'][:1].upper()
+            if area not in areas:
+                areas.append(area)
+        return areas
+
     def get_log_formats(self):
         filename = r'LogFormats.csv'
         log_formats = []
@@ -207,11 +223,18 @@ class Ui_Form(object):
             QMessageBox.warning(self.form, '警告', '加工记录格式文件中没有指定要读取的加工记录！', QMessageBox.Ok)
             return
 
-        dtFrom = self.dateFrom.date().toPyDate()
-        dtTo = self.dateTo.date().toPyDate()
+        servers_count = self.checked_servers_count()
+        if servers_count == 0:
+            QMessageBox.information(self.form, '提示', '没有选择需要导出数据的镭射机！', QMessageBox.Ok)
+            return
 
         save_path = QtWidgets.QFileDialog.getExistingDirectory(self.form, '选择加工记录保存路径', r'.')
-        servers_count = self.checked_servers_count()
+        if not save_path:
+            return
+
+        self.disable_button()
+        dtFrom = self.dateFrom.date().toPyDate()
+        dtTo = self.dateTo.date().toPyDate()
         count = 0
         for i, server in enumerate(self.servers):
             self.progressBar.setValue(int(count * 100 / servers_count))
@@ -244,7 +267,7 @@ class Ui_Form(object):
                         error_text.setBackground(QtGui.QColor(200, 50, 50))
                         self.tblServers.setItem(i, 4, error_text)
                 try:
-                    send_data(sock, False)      # 通知远程服务器关闭连接
+                    send_data(sock, False)  # 通知远程服务器关闭连接
                     sock.close()
                 except:
                     pass
@@ -254,6 +277,7 @@ class Ui_Form(object):
                     self.tblServers.setItem(i, 4, ok_text)
                 count += 1
         self.progressBar.setValue(int(count * 100 / servers_count))
+        self.enable_button()
         QMessageBox.information(self.form, '导出完成', '所有选择的镭射机加工记录已导出完毕。', QMessageBox.Ok)
         self.progressBar.setValue(0)
 
@@ -313,11 +337,8 @@ class Ui_Form(object):
         self.lcdTotalDays.display(1)
 
     def init_signal_connect(self):
-        self.chkAreaA.stateChanged.connect(self.checkbox_changed)
-        self.chkAreaB.stateChanged.connect(self.checkbox_changed)
-        self.chkAreaC.stateChanged.connect(self.checkbox_changed)
-        self.chkAreaD.stateChanged.connect(self.checkbox_changed)
-        self.chkAreaE.stateChanged.connect(self.checkbox_changed)
+        for ck in self.chkAreas:
+            ck.stateChanged.connect(self.checkbox_changed)
         self.dateFrom.dateChanged.connect(self.update_days)
         self.dateTo.dateChanged.connect(self.update_days)
         self.btnCheckRemoteServers.clicked.connect(self.check_remote_servers)
@@ -328,16 +349,6 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "三菱镭射机加工记录导出程序"))
         self.groupBox.setTitle(_translate("Form", "镭射机台选择"))
-        self.chkAreaA.setToolTip(_translate("Form", "<html><head/><body><p>取消/选择 所有A区镭射机</p></body></html>"))
-        self.chkAreaA.setText(_translate("Form", "A区"))
-        self.chkAreaB.setToolTip(_translate("Form", "<html><head/><body><p>取消/选择 所有B区镭射机</p></body></html>"))
-        self.chkAreaB.setText(_translate("Form", "B区"))
-        self.chkAreaC.setToolTip(_translate("Form", "<html><head/><body><p>取消/选择 所有C区镭射机</p></body></html>"))
-        self.chkAreaC.setText(_translate("Form", "C区"))
-        self.chkAreaD.setToolTip(_translate("Form", "<html><head/><body><p>取消/选择 所有D区镭射机</p></body></html>"))
-        self.chkAreaD.setText(_translate("Form", "D区"))
-        self.chkAreaE.setToolTip(_translate("Form", "<html><head/><body><p>取消/选择 所有E区镭射机</p></body></html>"))
-        self.chkAreaE.setText(_translate("Form", "E区"))
         self.groupBox_2.setTitle(_translate("Form", "加工时间"))
         self.label.setText(_translate("Form", "起始时间："))
         self.label_2.setText(_translate("Form", "结束时间："))
@@ -350,8 +361,6 @@ class Ui_Form(object):
         self.btnGetLog.setText(_translate("Form", "导出加工记录"))
         self.btnExit.setToolTip(_translate("Form", "<html><head/><body><p>关闭镭射机加工记录导出程序。</p></body></html>"))
         self.btnExit.setText(_translate("Form", "关闭程序"))
-
-
 
 
 def connect_to(host, port):
