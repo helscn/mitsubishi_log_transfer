@@ -92,6 +92,18 @@ class Ui_Form(object):
         self.horizontalLayout_2.setStretch(2, 2)
         self.horizontalLayout_2.setStretch(3, 1)
         self.verticalLayout_4.addLayout(self.horizontalLayout_2)
+
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.rbAsc = QtWidgets.QRadioButton(self.groupBox_2)
+        self.rbAsc.setObjectName("rbAsc")
+        self.horizontalLayout_4.addWidget(self.rbAsc)
+        self.rbDsc = QtWidgets.QRadioButton(self.groupBox_2)
+        self.rbDsc.setChecked(True)
+        self.rbDsc.setObjectName("rbDsc")
+        self.horizontalLayout_4.addWidget(self.rbDsc)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_4)
+
         spacerItem2 = QtWidgets.QSpacerItem(20, 48, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_4.addItem(spacerItem2)
         self.verticalLayout_6.addLayout(self.verticalLayout_4)
@@ -235,6 +247,9 @@ class Ui_Form(object):
         self.disable_button()
         dtFrom = self.dateFrom.date().toPyDate()
         dtTo = self.dateTo.date().toPyDate()
+        if self.rbDsc.isChecked():
+            dtFrom, dtTo = dtTo, dtFrom
+
         count = 0
         for i, server in enumerate(self.servers):
             self.progressBar.setValue(int(count * 100 / servers_count))
@@ -253,9 +268,9 @@ class Ui_Form(object):
                     try:
                         with open(os.path.join(save_path, log['localFileName'].format(**server)), 'wt') as f:
                             get_header = False
-                            for d in date_range(dtTo, dtFrom):
+                            for d in date_range(dtFrom, dtTo):
                                 send_data(sock, log['remoteFilePath'].format(**d))
-                                header, data = parse_log(recv_data(sock))
+                                header, data = parse_log(recv_data(sock), self.rbDsc.isChecked())
                                 if not get_header and header:
                                     f.write(header + '\n')
                                     get_header = True
@@ -354,6 +369,12 @@ class Ui_Form(object):
         self.label_2.setText(_translate("Form", "结束时间："))
         self.label_3.setText(_translate("Form", "共"))
         self.label_4.setText(_translate("Form", "天"))
+        self.rbAsc.setToolTip(
+            _translate("Form", "<html><head/><body><p>将加工记录中的数据按时间进行升序排列，最新的记录将排在最后。</p></body></html>"))
+        self.rbAsc.setText(_translate("Form", "升序排列"))
+        self.rbDsc.setToolTip(
+            _translate("Form", "<html><head/><body><p>将加工记录中的数据按时间进行降序排列，最新的记录将排在最前面。</p></body></html>"))
+        self.rbDsc.setText(_translate("Form", "降序排列"))
         self.btnCheckRemoteServers.setToolTip(
             _translate("Form", "<html><head/><body><p>检查所有镭射机的远程连接状态，无法连接的镭射机将无法导出加工记录。</p></body></html>"))
         self.btnCheckRemoteServers.setText(_translate("Form", "检查连接状态"))
@@ -400,7 +421,7 @@ def recv_data(the_socket):
     return pickle.loads(b''.join(total_data))
 
 
-def parse_log(log_data, coding='ANSI'):
+def parse_log(log_data, dsc_order=False, coding='ANSI'):
     if not log_data:
         return ('', '')
     if type(log_data) is bytes:
@@ -411,7 +432,8 @@ def parse_log(log_data, coding='ANSI'):
     if len(log) > 0:
         header = log[0]
         log = log[1:]
-    log.reverse()
+    if dsc_order:
+        log.reverse()
     return (header, '\n'.join(log))
 
 

@@ -1,3 +1,0 @@
-Output,RemoteFileName,LocalFileName,Comment
-TRUE,C:\pban\log\{Y}{m}\sinsyuku_{y}{m}{d}.log,{machine}-W.csv,Work Compensation
-TRUE,C:\pban\log\{Y}{m}\length_{y}{m}{d}.log,{machine}-A.csv,Alignment mark

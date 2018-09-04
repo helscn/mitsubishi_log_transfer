@@ -203,18 +203,45 @@
              </layout>
             </item>
             <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>48</height>
-               </size>
-              </property>
-             </spacer>
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                    <item>
+                        <widget class="QRadioButton" name="rbAsc">
+                            <property name="toolTip">
+                                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;将加工记录中的数据按时间进行升序排列，最新的记录将排在最后。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                            </property>
+                            <property name="text">
+                                <string>升序排列</string>
+                            </property>
+                        </widget>
+                    </item>
+                    <item>
+                        <widget class="QRadioButton" name="rbDsc">
+                            <property name="toolTip">
+                                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;将加工记录中的数据按时间进行降序排列，最新的记录将排在最前面。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                            </property>
+                            <property name="text">
+                                <string>降序排列</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                    </item>
+                </layout>
             </item>
+               <item>
+                   <spacer name="verticalSpacer">
+                       <property name="orientation">
+                           <enum>Qt::Vertical</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                           <size>
+                               <width>20</width>
+                               <height>48</height>
+                           </size>
+                       </property>
+                   </spacer>
+               </item>
            </layout>
           </item>
          </layout>
